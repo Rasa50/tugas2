@@ -13,7 +13,7 @@ pipeline {
         stage('Build & Push Docker Image') {
             steps {
                 withCredentials([usernamePassword(credentialsId: 'dockerhub-login', passwordVariable: 'PASS', usernameVariable: 'USER')]) {
-                    bat "echo %PASS% | docker login -u %USER% --password-stdin"
+                    bat "echo %PASS%| docker login -u %USER% --password-stdin"
                     bat "docker build -t ${USER}/tech-backend:latest ./backend"
                     bat "docker build -t ${USER}/tech-frontend:latest ./frontend"
                     bat "docker push ${USER}/tech-backend:latest"
