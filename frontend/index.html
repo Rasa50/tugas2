@@ -1,0 +1,152 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Tech Showcase</title>
+    <style>
+      body {
+        font-family: "Segoe UI", system-ui, sans-serif;
+        background-color: #f0f4f8;
+        color: #2d3748;
+        display: flex;
+        justify-content: center;
+        padding: 40px 20px;
+        margin: 0;
+      }
+      .container {
+        background: white;
+        width: 100%;
+        max-width: 480px;
+        padding: 30px;
+        border-radius: 16px;
+        box-shadow: 0 10px 25px rgba(148, 163, 184, 0.2);
+        border-top: 6px solid #64748b;
+      }
+      h1 {
+        font-size: 22px;
+        color: #1e293b;
+        margin: 0 0 10px 0;
+      }
+      .owner-tag {
+        background: #e2e8f0;
+        padding: 5px 12px;
+        border-radius: 20px;
+        font-size: 13px;
+        color: #475569;
+        display: inline-block;
+        margin-bottom: 25px;
+      }
+      ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+      }
+      li {
+        background: #f8fafc;
+        margin-bottom: 8px;
+        padding: 12px 15px;
+        border-radius: 10px;
+        border-left: 4px solid #94a3b8;
+        font-size: 15px;
+        transition: 0.2s;
+      }
+      li:hover {
+        transform: translateX(5px);
+        background: #f1f5f9;
+      }
+      .input-group {
+        margin-top: 30px;
+        display: flex;
+        gap: 10px;
+        border-top: 1px solid #e2e8f0;
+        padding-top: 20px;
+      }
+      input {
+        flex: 1;
+        padding: 12px;
+        border: 1.5px solid #cbd5e1;
+        border-radius: 8px;
+        outline: none;
+        transition: 0.3s;
+      }
+      input:focus {
+        border-color: #64748b;
+        background: #f8fafc;
+      }
+      button {
+        background: #64748b;
+        color: white;
+        border: none;
+        padding: 0 20px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: 600;
+      }
+      button:hover {
+        background: #475569;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1 id="katalog-title">Memuat...</h1>
+      <div class="owner-tag">
+        Owner: <span id="owner-name"></span> | <span id="owner-nim"></span>
+      </div>
+
+      <ul id="item-list"></ul>
+
+      <div class="input-group">
+        <input
+          type="text"
+          id="item-input"
+          placeholder="Tambah hardware baru..."
+        />
+        <button onclick="addItem()">Tambah</button>
+      </div>
+    </div>
+
+    <script>
+      const API_URL = "/api";
+
+      function loadData() {
+        fetch(`${API_URL}/info`)
+          .then((res) => res.json())
+          .then((data) => {
+            document.getElementById("katalog-title").innerText =
+              data.judul_katalog;
+            document.getElementById("owner-name").innerText = data.pemilik;
+            document.getElementById("owner-nim").innerText = data.nim;
+
+            const list = document.getElementById("item-list");
+            list.innerHTML = "";
+            data.items.forEach((item) => {
+              let li = document.createElement("li");
+              li.innerText = item;
+              list.appendChild(li);
+            });
+          })
+          .catch((err) => {
+            console.error("Gagal memuat data. Pastikan backend jalan!", err);
+            document.getElementById("katalog-title").innerText =
+              "Gagal Memuat Sistem";
+          });
+      }
+
+      function addItem() {
+        const input = document.getElementById("item-input");
+        if (!input.value.trim()) return;
+
+        fetch(`${API_URL}/add-item`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ item: input.value }),
+        }).then(() => {
+          input.value = "";
+          loadData();
+        });
+      }
+
+      loadData();
+    </script>
+  </body>
+</html>
